@@ -1,0 +1,36 @@
+alias: Garage Door Open Alert
+description: Sends mobile and Alexa notifications if garage door is open > 5 mins
+mode: restart
+trigger:
+  - platform: state
+    entity_id: binary_sensor.aqara_door_and_window_sensor_door_2
+    to: 'on'
+    for: '00:05:00'
+condition: []
+action:
+  - repeat:
+      while:
+        - condition: state
+          entity_id: binary_sensor.aqara_door_and_window_sensor_door_2
+          state: 'on'
+      sequence:
+        - service: notify.mobile_app_iphone_14_pro_max
+          data:
+            message: "Garage door is still open!"
+        - service: notify.mobile_app_iphone_6
+          data:
+            message: "Garage door is still open!"
+        - service: notify.alexa_media
+          data:
+            target:
+              - media_player.bathroom_echo
+              - media_player.kids_echo
+              - media_player.kitchen_echo_show
+              - media_player.livingroom_echo_show
+              - media_player.main_bathroom_echo_pop
+              - media_player.master_bedroom_echo_show
+              - media_player.odette_s_echo_dot
+            message: "Attention! The garage door has been left open."
+            data:
+              type: announce
+        - delay: '00:01:00'
